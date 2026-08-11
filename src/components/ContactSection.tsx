@@ -5,8 +5,9 @@ import { Magnet } from './Magnet';
 
 export const ContactSection: React.FC = () => {
   const [copied, setCopied] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', service: 'UI/UX Design', message: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '', projectType: 'UI/UX Design', message: '' });
 
   const email = 'motionmuse.design@gmail.com';
   const cubicEase = [0.22, 1, 0.36, 1] as const;
@@ -17,10 +18,42 @@ export const ContactSection: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormSubmitted(true);
-    setTimeout(() => setFormSubmitted(false), 4000);
+    setFormStatus('submitting');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('https://formspree.io/f/mbgroyvy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          projectType: formData.projectType,
+          message: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', projectType: 'UI/UX Design', message: '' });
+      } else {
+        const data = await response.json().catch(() => null);
+        if (data && data.errors && data.errors.length > 0) {
+          setErrorMessage(data.errors.map((err: { message: string }) => err.message).join(', '));
+        } else {
+          setErrorMessage('Unable to submit your message right now. Please try again.');
+        }
+        setFormStatus('error');
+      }
+    } catch {
+      setErrorMessage('Network connection error. Please check your connection and try again.');
+      setFormStatus('error');
+    }
   };
 
   const scrollToTop = () => {
@@ -128,15 +161,43 @@ export const ContactSection: React.FC = () => {
             transition={{ duration: 0.8, ease: cubicEase }}
             className="lg:col-span-7"
           >
-            <form onSubmit={handleSubmit} className="p-8 sm:p-10 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-2xl space-y-6">
-              {formSubmitted ? (
-                <div className="p-6 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-syne text-sm text-center">
-                  Thank you! Your message has been sent successfully. I will get back to you shortly.
+            <form
+              action="https://formspree.io/f/mbgroyvy"
+              method="POST"
+              onSubmit={handleSubmit}
+              className="p-8 sm:p-10 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-2xl space-y-6"
+            >
+              {formStatus === 'success' ? (
+                <div className="p-8 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center font-bold text-xl">
+                    ✓
+                  </div>
+                  <h3 className="font-bebas text-2xl tracking-wider text-emerald-200">
+                    MESSAGE SENT SUCCESSFULLY!
+                  </h3>
+                  <p className="font-syne text-xs text-emerald-300/80 leading-relaxed max-w-md mx-auto">
+                    Thank you for reaching out. Your message has been sent to Dia Khurana. I will review your project details and get back to you within 24 hours.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFormStatus('idle')}
+                    className="mt-2 inline-block px-5 py-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/30 text-emerald-200 font-syne text-xs uppercase tracking-wider hover:bg-emerald-800/80 transition-all cursor-pointer"
+                  >
+                    Send Another Message
+                  </button>
                 </div>
               ) : (
                 <>
+                  {formStatus === 'error' && (
+                    <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 font-syne text-xs text-center space-y-1">
+                      <p className="font-bold">Submission Failed</p>
+                      <p className="text-rose-200/80">{errorMessage}</p>
+                    </div>
+                  )}
+
                   <div className="relative">
                     <input
+                      name="name"
                       type="text"
                       required
                       value={formData.name}
@@ -148,6 +209,7 @@ export const ContactSection: React.FC = () => {
 
                   <div className="relative">
                     <input
+                      name="email"
                       type="email"
                       required
                       value={formData.email}
@@ -159,8 +221,9 @@ export const ContactSection: React.FC = () => {
 
                   <div className="relative">
                     <select
-                      value={formData.service}
-                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                      name="projectType"
+                      value={formData.projectType}
+                      onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
                       className="w-full px-5 py-4 rounded-xl bg-black border border-white/15 text-white font-syne text-sm focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all"
                     >
                       <option value="UI/UX Design">UI/UX Design</option>
@@ -175,6 +238,7 @@ export const ContactSection: React.FC = () => {
 
                   <div className="relative">
                     <textarea
+                      name="message"
                       rows={4}
                       required
                       value={formData.message}
@@ -188,11 +252,12 @@ export const ContactSection: React.FC = () => {
                   <Magnet padding={80} strength={2.5} className="w-full">
                     <button
                       type="submit"
-                      className="relative group overflow-hidden w-full py-4 rounded-xl bg-gradient-to-r from-[#C84B31] via-[#d8482b] to-[#b03d27] text-[#F0E6D2] font-syne text-xs uppercase tracking-widest font-bold transition-all shadow-[0_4px_25px_rgba(200,75,49,0.5)] hover:shadow-[0_0_45px_rgba(200,75,49,0.95)] cursor-pointer border border-white/20"
+                      disabled={formStatus === 'submitting'}
+                      className="relative group overflow-hidden w-full py-4 rounded-xl bg-gradient-to-r from-[#C84B31] via-[#d8482b] to-[#b03d27] text-[#F0E6D2] font-syne text-xs uppercase tracking-widest font-bold transition-all shadow-[0_4px_25px_rgba(200,75,49,0.5)] hover:shadow-[0_0_45px_rgba(200,75,49,0.95)] cursor-pointer border border-white/20 disabled:opacity-50"
                     >
                       <span className="absolute inset-0 w-full h-full bg-white/25 rounded-xl scale-0 group-hover:scale-150 transition-transform duration-700 ease-out pointer-events-none opacity-0 group-hover:opacity-100" />
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        <span>SEND MESSAGE</span>
+                        <span>{formStatus === 'submitting' ? 'SENDING...' : 'SEND MESSAGE'}</span>
                         <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
                     </button>
