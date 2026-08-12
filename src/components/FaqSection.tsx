@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
 
 interface FaqItem {
   question: string;
@@ -36,6 +37,7 @@ const faqsList: FaqItem[] = [
 ];
 
 export const FaqSection: React.FC = () => {
+  const isMobile = useMobile();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const cubicEase = [0.22, 1, 0.36, 1] as const;
 
@@ -68,7 +70,7 @@ export const FaqSection: React.FC = () => {
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, y: 30, filter: isMobile ? undefined : 'blur(10px)' }}
             whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease: cubicEase }}
@@ -85,17 +87,17 @@ export const FaqSection: React.FC = () => {
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 25, filter: 'blur(6px)' }}
+                initial={{ opacity: 0, y: 25, filter: isMobile ? undefined : 'blur(6px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.7, delay: index * 0.1, ease: cubicEase }}
-                className={`border border-white/15 rounded-2xl bg-black/40 backdrop-blur-xl overflow-hidden transition-all duration-300 ${
+                transition={{ duration: 0.7, delay: Math.min(index * 0.1, 0.3), ease: cubicEase }}
+                className={`border border-white/15 rounded-2xl bg-black/40 md:backdrop-blur-xl overflow-hidden transition-all duration-300 ${
                   isOpen ? 'border-l-4 border-l-[#C84B31] border-white/30 shadow-[0_0_30px_rgba(200,75,49,0.3)]' : 'hover:border-l-4 hover:border-l-[#C84B31]/60 hover:border-white/30'
                 }`}
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-6 text-left flex justify-between items-center gap-4 cursor-pointer select-none"
+                  className="w-full px-6 py-6 text-left flex justify-between items-center gap-4 cursor-pointer select-none min-h-[44px]"
                 >
                   <span className="font-syne font-medium text-base sm:text-lg text-[#F0E6D2] tracking-wide">
                     {faq.question}
@@ -129,3 +131,5 @@ export const FaqSection: React.FC = () => {
     </section>
   );
 };
+
+export default FaqSection;

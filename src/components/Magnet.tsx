@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useMobile } from '../hooks/useMobile';
 
 interface MagnetProps {
   children: React.ReactNode;
@@ -20,8 +21,11 @@ export const Magnet: React.FC<MagnetProps> = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isActive, setIsActive] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMobile();
 
   useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!elementRef.current) return;
       const rect = elementRef.current.getBoundingClientRect();
@@ -47,9 +51,13 @@ export const Magnet: React.FC<MagnetProps> = ({
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [padding, strength]);
+  }, [padding, strength, isMobile]);
+
+  if (isMobile) {
+    return <div className={`inline-block ${className}`}>{children}</div>;
+  }
 
   return (
     <div
@@ -65,3 +73,4 @@ export const Magnet: React.FC<MagnetProps> = ({
     </div>
   );
 };
+

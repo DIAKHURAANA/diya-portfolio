@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useMobile } from '../hooks/useMobile';
 
 const FRAME_COUNT = 40;
 
@@ -11,9 +12,10 @@ export const ScrollBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef<number>(0);
+  const isMobile = useMobile();
 
   useEffect(() => {
-    // Preload all frame images
+    // Preload frame images
     const loadedImages: HTMLImageElement[] = [];
     let loadedCount = 0;
 
@@ -34,20 +36,20 @@ export const ScrollBackground: React.FC = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { alpha: false });
       if (!ctx) return;
 
       const img = imagesRef.current[index];
       if (!img || !img.complete || img.naturalWidth === 0) return;
 
-      // Handle retina displays & proper canvas resolution
-      const dpr = window.devicePixelRatio || 1;
+      // Handle retina displays - cap DPR on mobile to 1 for high performance
+      const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       const width = window.innerWidth;
       const height = window.innerHeight;
 
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
+      if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
       }
 
       ctx.save();
@@ -76,25 +78,32 @@ export const ScrollBackground: React.FC = () => {
       ctx.restore();
     };
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
+    let ticking = false;
 
     const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const maxScroll = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-      const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
-      
-      const frameIndex = Math.min(
-        FRAME_COUNT - 1,
-        Math.floor(scrollFraction * FRAME_COUNT)
-      );
+      if (ticking) return;
+      ticking = true;
 
-      if (frameIndex !== currentFrameRef.current) {
-        currentFrameRef.current = frameIndex;
-        animationFrameId = requestAnimationFrame(() => renderFrame(frameIndex));
-      }
+      animationFrameId = requestAnimationFrame(() => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const maxScroll = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight
+        );
+        const scrollFraction = Math.min(1, Math.max(0, scrollTop / maxScroll));
+        
+        const frameIndex = Math.min(
+          FRAME_COUNT - 1,
+          Math.floor(scrollFraction * FRAME_COUNT)
+        );
+
+        if (frameIndex !== currentFrameRef.current) {
+          currentFrameRef.current = frameIndex;
+          renderFrame(frameIndex);
+        }
+        ticking = false;
+      });
     };
 
     const handleResize = () => {
@@ -102,7 +111,7 @@ export const ScrollBackground: React.FC = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
     handleScroll(); // Initial frame calculation
 
     return () => {
@@ -112,14 +121,15 @@ export const ScrollBackground: React.FC = () => {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, []);
+  }, [isMobile]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" style={{ transform: 'translateZ(0)' }}>
       {/* Background Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full object-cover opacity-90 transition-opacity duration-500 filter brightness-105 contrast-105 relative z-10"
+        className="w-full h-full object-cover opacity-90 transition-opacity duration-500 relative z-10 md:brightness-105 md:contrast-105"
+        style={{ willChange: 'contents' }}
       />
       {/* Soft Vignette & Subtle Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/35 pointer-events-none z-20" />
@@ -127,3 +137,4 @@ export const ScrollBackground: React.FC = () => {
     </div>
   );
 };
+

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
+import { useInView } from '../hooks/useInView';
 
 interface Testimonial {
   id: number;
@@ -57,6 +59,8 @@ const testimonialsList: Testimonial[] = [
 ];
 
 export const ReviewSection: React.FC = () => {
+  const isMobile = useMobile();
+  const { ref: sectionRef, isInView } = useInView<HTMLElement>({ threshold: 0.05 });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -72,7 +76,7 @@ export const ReviewSection: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isPaused) {
+    if (isInView && !isPaused) {
       timeoutRef.current = setTimeout(() => {
         handleNext();
       }, 5000);
@@ -80,11 +84,12 @@ export const ReviewSection: React.FC = () => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [activeIndex, isPaused]);
+  }, [activeIndex, isPaused, isInView]);
 
   return (
     <section
       id="testimonials"
+      ref={sectionRef}
       className="relative min-h-screen w-full py-28 px-6 sm:px-10 md:px-16 bg-transparent overflow-hidden border-t border-white/10 select-none"
     >
       {/* Ambient Red Glow */}
@@ -107,7 +112,7 @@ export const ReviewSection: React.FC = () => {
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, y: 30, filter: isMobile ? undefined : 'blur(10px)' }}
             whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease: cubicEase }}
@@ -117,7 +122,7 @@ export const ReviewSection: React.FC = () => {
           </motion.h2>
         </div>
 
-        {/* Featured Card + Inertia Slider Container */}
+        {/* Featured Card + Slider Container */}
         <div
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -130,8 +135,8 @@ export const ReviewSection: React.FC = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -30 }}
               transition={{ duration: 0.7, ease: cubicEase }}
-              whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="p-8 sm:p-12 rounded-3xl bg-black/50 backdrop-blur-xl border border-white/20 hover:border-[#C84B31]/70 shadow-[0_20px_50px_rgba(0,0,0,0.9)] hover:shadow-[0_0_40px_rgba(200,75,49,0.5)] transition-all duration-300 relative overflow-hidden"
+              whileHover={{ y: isMobile ? 0 : -6, transition: { duration: 0.3 } }}
+              className="p-8 sm:p-12 rounded-3xl bg-black/50 md:backdrop-blur-xl border border-white/20 hover:border-[#C84B31]/70 shadow-[0_20px_50px_rgba(0,0,0,0.9)] hover:shadow-[0_0_40px_rgba(200,75,49,0.5)] transition-all duration-300 relative overflow-hidden"
             >
               {/* Soft Ambient Corner Glow */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#C84B31]/20 rounded-full blur-3xl pointer-events-none" />
@@ -149,7 +154,7 @@ export const ReviewSection: React.FC = () => {
                 {testimonialsList[activeIndex].tag}
               </span>
 
-              {/* Quote Paragraph with Animated Red Underline Sweep on Highlight Words */}
+              {/* Quote Paragraph */}
               <p className="font-syne text-base sm:text-xl font-light text-[#F0E6D2] leading-relaxed italic mb-8 relative z-10">
                 &ldquo;{testimonialsList[activeIndex].quote}&rdquo;
               </p>
@@ -158,6 +163,7 @@ export const ReviewSection: React.FC = () => {
                 <img
                   src={testimonialsList[activeIndex].avatar}
                   alt={testimonialsList[activeIndex].name}
+                  loading="lazy"
                   className="w-14 h-14 rounded-full object-cover border-2 border-[#C84B31]/60"
                 />
                 <div>
@@ -206,3 +212,6 @@ export const ReviewSection: React.FC = () => {
     </section>
   );
 };
+
+export default ReviewSection;
+

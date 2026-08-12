@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Target, Palette, Code2, Rocket, ArrowRight, Sparkles } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
 
 interface ProcessStep {
   id: string;
@@ -55,6 +56,7 @@ const processSteps: ProcessStep[] = [
 ];
 
 export const ProcessSection: React.FC = () => {
+  const isMobile = useMobile();
   const cubicEase = [0.4, 0, 0.2, 1] as const;
 
   return (
@@ -107,15 +109,15 @@ export const ProcessSection: React.FC = () => {
             return (
               <motion.div
                 key={step.id}
-                initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }}
+                initial={{ opacity: 0, y: 40, filter: isMobile ? undefined : 'blur(8px)' }}
                 whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 viewport={{ once: true }}
                 transition={{
                   duration: 0.8,
-                  delay: index * 0.12,
+                  delay: Math.min(index * 0.12, 0.36),
                   ease: cubicEase,
                 }}
-                className="group relative rounded-3xl p-7 bg-black/40 backdrop-blur-xl border border-white/10 hover:border-[#C84B31]/60 transition-all duration-500 shadow-xl hover:shadow-[0_15px_35px_rgba(200,75,49,0.25)] flex flex-col justify-between"
+                className="group relative rounded-3xl p-7 bg-black/40 md:backdrop-blur-xl border border-white/10 hover:border-[#C84B31]/60 transition-all duration-500 shadow-xl hover:shadow-[0_15px_35px_rgba(200,75,49,0.25)] flex flex-col justify-between"
               >
                 {/* Background Hover Accent Glow */}
                 <div className="absolute inset-0 bg-gradient-to-b from-[#C84B31]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none" />
@@ -164,8 +166,8 @@ export const ProcessSection: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6, ease: cubicEase }}
-          className="mt-14 p-6 sm:p-8 rounded-3xl bg-black/60 border border-white/15 backdrop-blur-2xl flex flex-col md:flex-row items-center justify-between gap-6"
+          transition={{ duration: 0.8, delay: 0.4, ease: cubicEase }}
+          className="mt-14 p-6 sm:p-8 rounded-3xl bg-black/60 border border-white/15 md:backdrop-blur-2xl flex flex-col md:flex-row items-center justify-between gap-6"
         >
           <div className="flex items-center gap-4 text-center md:text-left">
             <div className="w-12 h-12 rounded-full bg-[#C84B31]/20 border border-[#C84B31]/50 flex items-center justify-center shrink-0">
@@ -195,3 +197,4 @@ export const ProcessSection: React.FC = () => {
 };
 
 export default ProcessSection;
+

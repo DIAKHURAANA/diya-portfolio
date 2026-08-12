@@ -57,3 +57,45 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #3b3f48;
 }
+
+/* Touch Scrolling & Mobile Performance Overrides */
+html, body {
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  /* Disable expensive backdrop-filter blur on mobile devices */
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(15, 15, 18, 0.92) !important;
+  }
+
+  /* Disable heavy continuous background blur layers on mobile GPU */
+  .blur-3xl,
+  .blur-2xl,
+  .blur-\[160px\],
+  .blur-\[140px\],
+  .blur-\[120px\],
+  .blur-\[100px\],
+  .blur-\[80px\] {
+    filter: none !important;
+    opacity: 0.15 !important;
+  }
+}
+
+/* Prefers Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

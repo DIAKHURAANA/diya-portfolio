@@ -2,24 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Globe, Palette, Video, Megaphone, Layers, Sparkles, User, Mail, ArrowDown } from 'lucide-react';
 import { Magnet } from './Magnet';
+import { useMobile } from '../hooks/useMobile';
 
 interface HeroSectionProps {
   onContactClick?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
+  const isMobile = useMobile();
   const [cursorPos, setCursorPos] = useState({ x: -200, y: -200 });
 
   useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isMobile]);
 
   const { scrollY } = useScroll();
-  const textY = useTransform(scrollY, [0, 800], [0, 50]);
+  const textY = useTransform(scrollY, [0, 800], [0, isMobile ? 0 : 50]);
 
   const navLinks = [
     { name: 'About', href: '#about' },
@@ -41,19 +45,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
 
   return (
     <section className="relative min-h-screen w-full flex flex-col justify-between overflow-x-clip bg-transparent pt-5 pb-6 px-5 sm:px-8 md:px-12 select-none">
-      {/* Glowing Cursor Follow Light Effect (Dual Ring) */}
-      <div
-        className="pointer-events-none fixed z-20 w-[480px] h-[480px] rounded-full bg-gradient-to-r from-[#C84B31]/30 via-rose-600/20 to-purple-700/25 blur-3xl transition-transform duration-75 ease-out opacity-90"
-        style={{
-          transform: `translate3d(${cursorPos.x - 240}px, ${cursorPos.y - 240}px, 0)`,
-        }}
-      />
-      <div
-        className="pointer-events-none fixed z-20 w-44 h-44 rounded-full bg-[#C84B31]/40 blur-2xl transition-transform duration-100 ease-out opacity-75"
-        style={{
-          transform: `translate3d(${cursorPos.x - 88}px, ${cursorPos.y - 88}px, 0)`,
-        }}
-      />
+      {/* Glowing Cursor Follow Light Effect (Dual Ring) - Hidden on Mobile for GPU smoothness */}
+      {!isMobile && (
+        <>
+          <div
+            className="pointer-events-none fixed z-20 w-[480px] h-[480px] rounded-full bg-gradient-to-r from-[#C84B31]/30 via-rose-600/20 to-purple-700/25 blur-3xl transition-transform duration-75 ease-out opacity-90"
+            style={{
+              transform: `translate3d(${cursorPos.x - 240}px, ${cursorPos.y - 240}px, 0)`,
+            }}
+          />
+          <div
+            className="pointer-events-none fixed z-20 w-44 h-44 rounded-full bg-[#C84B31]/40 blur-2xl transition-transform duration-100 ease-out opacity-75"
+            style={{
+              transform: `translate3d(${cursorPos.x - 88}px, ${cursorPos.y - 88}px, 0)`,
+            }}
+          />
+        </>
+      )}
 
       {/* Grain & Dark Vignette */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(10,10,12,0.9)_100%)] pointer-events-none z-10" />
@@ -65,6 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
             <img
               src="/logo-emblem.png"
               alt="MOTIONMUSE Logo Emblem"
+              loading="lazy"
               className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(168,85,247,0.7)] group-hover:scale-110 transition-transform duration-300"
             />
             <span className="text-xs sm:text-sm font-syne uppercase tracking-[0.25em] text-[#EAE0D5]/90 font-bold group-hover:text-white transition-colors">
@@ -84,7 +93,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-[#C84B31]/30 bg-[#C84B31]/10 backdrop-blur-md text-[#EAE0D5] text-xs font-syne uppercase tracking-widest">
+        <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-[#C84B31]/30 bg-[#C84B31]/10 md:backdrop-blur-md text-[#EAE0D5] text-xs font-syne uppercase tracking-widest">
           <span className="w-2 h-2 rounded-full bg-[#C84B31] animate-pulse shadow-[0_0_8px_#C84B31]" />
           <span>AVAILABLE FOR FREELANCE</span>
         </div>
@@ -97,7 +106,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
       >
         {/* LEFT COLUMN */}
         <motion.div
-          initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
+          initial={{ opacity: 0, x: -30, filter: isMobile ? undefined : 'blur(8px)' }}
           animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="lg:col-span-6 flex flex-col justify-end space-y-5"
@@ -163,7 +172,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
 
         {/* RIGHT COLUMN */}
         <motion.div
-          initial={{ opacity: 0, x: 30, filter: 'blur(8px)' }}
+          initial={{ opacity: 0, x: 30, filter: isMobile ? undefined : 'blur(8px)' }}
           animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
           transition={{ duration: 0.8, delay: 0.4 }}
           className="lg:col-span-6 flex flex-col justify-end space-y-4 text-left"
@@ -251,7 +260,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
 
       {/* 🔻 HERO SECTION – BOTTOM ICON STRIP */}
       <div className="relative z-30 w-full pt-4 pb-2 mt-4">
-        {/* Top Border Line with Gradient Fade (transparent → white/accent → transparent) */}
+        {/* Top Border Line with Gradient Fade */}
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#F0E6D2]/30 to-transparent mb-5" />
 
         {/* Horizontal Row of Minimal Icons */}
@@ -265,12 +274,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
                 animate={{
                   opacity: 0.6,
                   y: 0,
-                  x: [0, 2.5, 0, -2.5, 0],
+                  x: isMobile ? 0 : [0, 2.5, 0, -2.5, 0],
                 }}
                 transition={{
                   opacity: { duration: 0.6, delay: 0.1 * index },
                   y: { duration: 0.6, delay: 0.1 * index },
-                  x: { duration: 4 + index * 0.5, repeat: Infinity, ease: 'easeInOut' },
+                  x: isMobile ? { duration: 0 } : { duration: 4 + index * 0.5, repeat: Infinity, ease: 'easeInOut' },
                 }}
                 whileHover={{
                   scale: 1.1,
@@ -315,3 +324,4 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onContactClick }) => {
     </section>
   );
 };
+

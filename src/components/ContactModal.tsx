@@ -78,7 +78,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 bg-black/85 md:backdrop-blur-md"
           />
 
           {/* Modal Card */}
@@ -87,12 +87,12 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative w-full max-w-xl bg-[#121214] border border-[#D7E2EA]/20 rounded-[32px] p-6 sm:p-8 z-10 shadow-2xl overflow-hidden my-auto"
+            className="relative w-full max-w-xl bg-[#121214] border border-[#D7E2EA]/20 rounded-[32px] p-6 sm:p-8 z-10 shadow-2xl overflow-y-auto max-h-[90vh] my-auto"
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 text-[#D7E2EA]/60 hover:text-white bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-full p-2 transition-colors cursor-pointer"
+              className="absolute top-6 right-6 text-[#D7E2EA]/60 hover:text-white bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-full p-2 transition-colors cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
             >
               <X size={20} />
             </button>
@@ -139,7 +139,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                       placeholder="e.g. Alex Morgan"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-4 py-3 text-[#D7E2EA] placeholder-[#D7E2EA]/30 focus:outline-none focus:border-[#C84B31] transition-colors text-sm"
+                      className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-4 py-3 text-[#D7E2EA] placeholder-[#D7E2EA]/30 focus:outline-none focus:border-[#C84B31] transition-colors text-sm min-h-[44px]"
                     />
                   </div>
 
@@ -154,11 +154,11 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                       placeholder="alex@company.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-4 py-3 text-[#D7E2EA] placeholder-[#D7E2EA]/30 focus:outline-none focus:border-[#C84B31] transition-colors text-sm"
+                      className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-4 py-3 text-[#D7E2EA] placeholder-[#D7E2EA]/30 focus:outline-none focus:border-[#C84B31] transition-colors text-sm min-h-[44px]"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs uppercase tracking-widest text-[#D7E2EA]/70 mb-1.5 font-mono">
                         Project Type *
@@ -167,7 +167,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                         name="projectType"
                         value={formData.projectType}
                         onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                        className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-3 py-3 text-[#D7E2EA] focus:outline-none focus:border-[#C84B31] transition-colors text-sm"
+                        className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-3 py-3 text-[#D7E2EA] focus:outline-none focus:border-[#C84B31] transition-colors text-sm min-h-[44px]"
                       >
                         <option value="3D Modeling">01 - 3D Modeling</option>
                         <option value="UI/UX Design">02 - UI/UX Design</option>
@@ -185,7 +185,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                         name="budget"
                         value={formData.budget}
                         onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                        className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-3 py-3 text-[#D7E2EA] focus:outline-none focus:border-[#C84B31] transition-colors text-sm"
+                        className="w-full bg-[#0C0C0C] border border-[#D7E2EA]/20 rounded-xl px-3 py-3 text-[#D7E2EA] focus:outline-none focus:border-[#C84B31] transition-colors text-sm min-h-[44px]"
                       >
                         <option value="<$3k">&lt; $3,000</option>
                         <option value="$3k - $5k">$3,000 - $5,000</option>
@@ -214,7 +214,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                     <button
                       type="submit"
                       disabled={formStatus === 'submitting'}
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[44px]"
                     >
                       <ContactButton label={formStatus === 'submitting' ? 'Sending...' : 'Send Brief'} />
                     </button>
@@ -228,3 +228,4 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
     </AnimatePresence>
   );
 };
+

@@ -2,45 +2,52 @@ import React, { useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Sparkles, Play, Volume2, VolumeX, X } from 'lucide-react';
 import { Magnet } from './Magnet';
+import { useMobile } from '../hooks/useMobile';
+import { useInView } from '../hooks/useInView';
+import { LazyVideo } from './LazyVideo';
 
 interface FeaturedProjectProps {
   onOpenModal?: () => void;
 }
 
 export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
+  const isMobile = useMobile();
+  const { ref: sectionRef, isInView } = useInView<HTMLElement>({ threshold: 0.05 });
   const cubicEase = [0.4, 0, 0.2, 1] as const;
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   const { scrollYProgress } = useScroll();
-  const scaleZoom = useTransform(scrollYProgress, [0.4, 0.8], [1, 1.15]);
-  const textY = useTransform(scrollYProgress, [0.4, 0.8], [0, -40]);
+  const scaleZoom = useTransform(scrollYProgress, [0.4, 0.8], [1, isMobile ? 1 : 1.15]);
+  const textY = useTransform(scrollYProgress, [0.4, 0.8], [0, isMobile ? 0 : -40]);
 
   const videoPath = '/videos/ads_branding.mp4';
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center bg-black overflow-hidden border-t border-white/10 select-none">
+    <section ref={sectionRef} className="relative min-h-screen w-full flex items-center justify-center bg-black overflow-hidden border-t border-white/10 select-none">
       {/* Background Visual Container with Video & Slow Zoom-In */}
       <motion.div
         style={{ scale: scaleZoom }}
         className="absolute inset-0 w-full h-full pointer-events-none"
       >
-        <video
+        <LazyVideo
           src={videoPath}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover filter brightness-75 contrast-110"
+          isMobile={isMobile}
+          className="w-full h-full"
+          videoClassName="w-full h-full object-cover filter brightness-75 contrast-110"
         />
         {/* Dark Cinematic Vignette & Color Grading Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(10,10,12,0.95)_90%)]" />
       </motion.div>
 
-      {/* Floating Particles / Light Leaks */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#C84B31]/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
+      {/* Floating Particles / Light Leaks - Hidden on mobile */}
+      {!isMobile && isInView && (
+        <>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#C84B31]/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
+        </>
+      )}
 
       {/* Grain Overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.8)_100%)] pointer-events-none z-10" />
@@ -56,7 +63,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: cubicEase }}
-          className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#C84B31]/40 bg-[#C84B31]/10 backdrop-blur-md text-[#EAE0D5] text-xs font-syne uppercase tracking-widest"
+          className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#C84B31]/40 bg-[#C84B31]/10 md:backdrop-blur-md text-[#EAE0D5] text-xs font-syne uppercase tracking-widest"
         >
           <Sparkles className="w-4 h-4 text-[#C84B31] animate-spin-slow" />
           <span>FLAGSHIP ADS & BRANDING SHOWCASE</span>
@@ -65,8 +72,8 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
         {/* Large Typography with Mask Wipe Animation */}
         <div className="overflow-hidden">
           <motion.h2
-            initial={{ clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)', y: 40 }}
-            whileInView={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', y: 0 }}
+            initial={{ clipPath: isMobile ? undefined : 'polygon(0 0, 0 0, 0 100%, 0 100%)', y: 40, opacity: 0 }}
+            whileInView={{ clipPath: isMobile ? undefined : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', y: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.1, ease: cubicEase }}
             className="font-bebas text-6xl sm:text-8xl md:text-9xl uppercase tracking-tighter text-[#F0E6D2] leading-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
@@ -116,7 +123,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-2xl select-none"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 md:backdrop-blur-2xl select-none"
             onClick={() => setIsVideoModalOpen(false)}
           >
             <motion.div
@@ -189,4 +196,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
     </section>
   );
 };
+
+export default FeaturedProjectSection;
+
 

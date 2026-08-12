@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Play, Volume2, VolumeX, X, Sparkles } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
+import { LazyVideo } from './LazyVideo';
 
 interface ProjectItem {
   id: string;
@@ -71,6 +73,7 @@ const projectsList: ProjectItem[] = [
 ];
 
 export const ProjectsSection: React.FC = () => {
+  const isMobile = useMobile();
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedVideo, setSelectedVideo] = useState<ProjectItem | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -129,12 +132,12 @@ export const ProjectsSection: React.FC = () => {
           {projectsList.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 50, filter: 'blur(12px)' }}
+              initial={{ opacity: 0, y: 50, filter: isMobile ? undefined : 'blur(12px)' }}
               whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{
                 duration: 0.9,
-                delay: index * 0.1,
+                delay: Math.min(index * 0.1, 0.3),
                 ease: cubicEase,
               }}
               onClick={() => {
@@ -143,30 +146,29 @@ export const ProjectsSection: React.FC = () => {
                   setIsMuted(false);
                 }
               }}
-              className="group relative rounded-3xl overflow-hidden border border-white/15 bg-black/40 backdrop-blur-xl shadow-2xl cursor-pointer"
+              className="group relative rounded-3xl overflow-hidden border border-white/15 bg-black/40 md:backdrop-blur-xl shadow-2xl cursor-pointer"
             >
               {/* Media Preview: Video or Image */}
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-black">
                 {project.video ? (
-                  <video
+                  <LazyVideo
                     src={project.video}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out filter brightness-95 contrast-105"
+                    isMobile={isMobile}
+                    className="w-full h-full"
+                    videoClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out filter brightness-95 contrast-105"
                   />
                 ) : (
                   <img
                     src={project.image}
                     alt={project.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out filter brightness-90 contrast-105"
                   />
                 )}
 
                 {/* Video Indicator Badge */}
                 {project.video && (
-                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 border border-[#C84B31]/60 backdrop-blur-md text-[#F0E6D2] text-[10px] font-syne uppercase tracking-widest">
+                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 border border-[#C84B31]/60 md:backdrop-blur-md text-[#F0E6D2] text-[10px] font-syne uppercase tracking-widest">
                     <span className="w-2 h-2 rounded-full bg-[#C84B31] animate-pulse" />
                     <span>UGC REEL</span>
                     <Play className="w-3 h-3 text-[#C84B31] fill-current ml-0.5" />
@@ -181,7 +183,7 @@ export const ProjectsSection: React.FC = () => {
               <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none z-10">
                 {/* Top Badge */}
                 <div className="flex justify-between items-center">
-                  <span className="px-3.5 py-1.5 rounded-full bg-black/50 border border-white/20 backdrop-blur-md text-[10px] font-syne uppercase tracking-widest text-[#EAE0D5]">
+                  <span className="px-3.5 py-1.5 rounded-full bg-black/50 border border-white/20 md:backdrop-blur-md text-[10px] font-syne uppercase tracking-widest text-[#EAE0D5]">
                     {project.tag}
                   </span>
                   <span className="font-cinzel text-sm font-bold text-[#C84B31]">
@@ -222,7 +224,7 @@ export const ProjectsSection: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-2xl select-none"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 md:backdrop-blur-2xl select-none"
             onClick={() => setSelectedVideo(null)}
           >
             <motion.div
@@ -299,4 +301,5 @@ export const ProjectsSection: React.FC = () => {
 };
 
 export default ProjectsSection;
+
 

@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, ArrowUpRight, Copy, Check, Send, Sparkles } from 'lucide-react';
 import { Magnet } from './Magnet';
+import { useMobile } from '../hooks/useMobile';
+import { useInView } from '../hooks/useInView';
 
 export const ContactSection: React.FC = () => {
+  const isMobile = useMobile();
+  const { ref: footerRef, isInView } = useInView<HTMLElement>({ threshold: 0.05 });
   const [copied, setCopied] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -72,16 +76,18 @@ export const ContactSection: React.FC = () => {
   ];
 
   return (
-    <footer id="contact" className="relative min-h-screen w-full pt-28 pb-6 px-6 sm:px-10 md:px-16 bg-transparent overflow-hidden border-t border-white/10 select-none">
-      {/* Slow Moving Ambient Background & Floating Particles */}
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-          opacity: [0.15, 0.3, 0.15],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-b from-[#C84B31]/25 via-purple-900/15 to-transparent blur-[160px] pointer-events-none"
-      />
+    <footer id="contact" ref={footerRef} className="relative min-h-screen w-full pt-28 pb-6 px-6 sm:px-10 md:px-16 bg-transparent overflow-hidden border-t border-white/10 select-none">
+      {/* Slow Moving Ambient Background - Paused when out of view or on mobile */}
+      {!isMobile && isInView && (
+        <motion.div
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.15, 0.3, 0.15],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-b from-[#C84B31]/25 via-purple-900/15 to-transparent blur-[160px] pointer-events-none"
+        />
+      )}
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* 🤝 CTA SECTION: Dramatic Scale-In Heading with Red Color Sweep */}
@@ -101,7 +107,7 @@ export const ContactSection: React.FC = () => {
 
           {/* Dramatic Scale-In Heading */}
           <motion.h2
-            initial={{ opacity: 0, scale: 0.85, filter: 'blur(12px)' }}
+            initial={{ opacity: 0, scale: isMobile ? 1 : 0.85, filter: isMobile ? undefined : 'blur(12px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease: cubicEase }}
@@ -125,13 +131,13 @@ export const ContactSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
           {/* Direct Email Card */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: isMobile ? 0 : -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: cubicEase }}
             className="lg:col-span-5 space-y-6"
           >
-            <div className="p-8 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-2xl space-y-6">
+            <div className="p-8 rounded-3xl bg-black/40 md:backdrop-blur-xl border border-white/15 shadow-2xl space-y-6">
               <span className="font-syne text-xs uppercase tracking-widest text-[#C84B31] font-bold block">
                 DIRECT EMAIL & CALL
               </span>
@@ -139,7 +145,7 @@ export const ContactSection: React.FC = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-3 px-6 py-3.5 rounded-full border border-white/20 bg-white/5 text-[#F0E6D2] font-mono text-sm hover:border-[#C84B31] transition-all cursor-pointer group"
+                  className="flex items-center gap-3 px-6 py-3.5 rounded-full border border-white/20 bg-white/5 text-[#F0E6D2] font-mono text-sm hover:border-[#C84B31] transition-all cursor-pointer group min-h-[44px]"
                 >
                   <Mail size={16} className="text-[#C84B31]" />
                   <span>{email}</span>
@@ -155,7 +161,7 @@ export const ContactSection: React.FC = () => {
 
           {/* Minimal Form with Glow Pulse Button */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: isMobile ? 0 : 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: cubicEase }}
@@ -165,7 +171,7 @@ export const ContactSection: React.FC = () => {
               action="https://formspree.io/f/mbgroyvy"
               method="POST"
               onSubmit={handleSubmit}
-              className="p-8 sm:p-10 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-2xl space-y-6"
+              className="p-8 sm:p-10 rounded-3xl bg-black/40 md:backdrop-blur-xl border border-white/15 shadow-2xl space-y-6"
             >
               {formStatus === 'success' ? (
                 <div className="p-8 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-center space-y-4">
@@ -181,7 +187,7 @@ export const ContactSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFormStatus('idle')}
-                    className="mt-2 inline-block px-5 py-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/30 text-emerald-200 font-syne text-xs uppercase tracking-wider hover:bg-emerald-800/80 transition-all cursor-pointer"
+                    className="mt-2 inline-block px-5 py-2.5 rounded-xl bg-emerald-900/60 border border-emerald-500/30 text-emerald-200 font-syne text-xs uppercase tracking-wider hover:bg-emerald-800/80 transition-all cursor-pointer min-h-[44px]"
                   >
                     Send Another Message
                   </button>
@@ -203,7 +209,7 @@ export const ContactSection: React.FC = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Your Name"
-                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-syne text-sm placeholder-[#EAE0D5]/40 focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all"
+                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-syne text-sm placeholder-[#EAE0D5]/40 focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all min-h-[44px]"
                     />
                   </div>
 
@@ -215,7 +221,7 @@ export const ContactSection: React.FC = () => {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="Your Email Address"
-                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-syne text-sm placeholder-[#EAE0D5]/40 focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all"
+                      className="w-full px-5 py-4 rounded-xl bg-white/5 border border-white/15 text-white font-syne text-sm placeholder-[#EAE0D5]/40 focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all min-h-[44px]"
                     />
                   </div>
 
@@ -224,7 +230,7 @@ export const ContactSection: React.FC = () => {
                       name="projectType"
                       value={formData.projectType}
                       onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                      className="w-full px-5 py-4 rounded-xl bg-black border border-white/15 text-white font-syne text-sm focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all"
+                      className="w-full px-5 py-4 rounded-xl bg-black border border-white/15 text-white font-syne text-sm focus:outline-none focus:border-[#C84B31] focus:shadow-[0_0_20px_rgba(200,75,49,0.4)] transition-all min-h-[44px]"
                     >
                       <option value="UI/UX Design">UI/UX Design</option>
                       <option value="Web Design & Dev">Web Design & Dev</option>
@@ -253,7 +259,7 @@ export const ContactSection: React.FC = () => {
                     <button
                       type="submit"
                       disabled={formStatus === 'submitting'}
-                      className="relative group overflow-hidden w-full py-4 rounded-xl bg-gradient-to-r from-[#C84B31] via-[#d8482b] to-[#b03d27] text-[#F0E6D2] font-syne text-xs uppercase tracking-widest font-bold transition-all shadow-[0_4px_25px_rgba(200,75,49,0.5)] hover:shadow-[0_0_45px_rgba(200,75,49,0.95)] cursor-pointer border border-white/20 disabled:opacity-50"
+                      className="relative group overflow-hidden w-full py-4 rounded-xl bg-gradient-to-r from-[#C84B31] via-[#d8482b] to-[#b03d27] text-[#F0E6D2] font-syne text-xs uppercase tracking-widest font-bold transition-all shadow-[0_4px_25px_rgba(200,75,49,0.5)] hover:shadow-[0_0_45px_rgba(200,75,49,0.95)] cursor-pointer border border-white/20 disabled:opacity-50 min-h-[44px]"
                     >
                       <span className="absolute inset-0 w-full h-full bg-white/25 rounded-xl scale-0 group-hover:scale-150 transition-transform duration-700 ease-out pointer-events-none opacity-0 group-hover:opacity-100" />
                       <span className="relative z-10 flex items-center justify-center gap-2">
@@ -278,10 +284,10 @@ export const ContactSection: React.FC = () => {
           className="h-[1px] w-full bg-gradient-to-r from-[#C84B31] via-white/30 to-[#C84B31] origin-left mb-8"
         />
 
-        {/* Horizontal Infinite Marquee Text */}
+        {/* Horizontal Infinite Marquee Text - Only animate when in view */}
         <div className="overflow-hidden w-full mb-10 py-2 border-y border-white/10">
           <motion.div
-            animate={{ x: [0, -1000] }}
+            animate={isInView ? { x: [0, -1000] } : { x: 0 }}
             transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
             className="flex whitespace-nowrap w-max"
           >
@@ -291,7 +297,7 @@ export const ContactSection: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Footer Navigation & Social Icons with Sequential Fade-In & Red Hover Shift */}
+        {/* Footer Navigation & Social Icons */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start">
             <span className="font-cinzel font-bold text-2xl tracking-widest uppercase text-[#F0E6D2]">
@@ -302,7 +308,7 @@ export const ContactSection: React.FC = () => {
             </span>
           </div>
 
-          {/* Sequential Social Icons (Instagram, LinkedIn, Dribbble, Email) */}
+          {/* Sequential Social Icons */}
           <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
             {socialLinks.map((social, i) => (
               <motion.a
@@ -313,9 +319,9 @@ export const ContactSection: React.FC = () => {
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: cubicEase }}
-                whileHover={{ scale: 1.15, rotate: 4 }}
-                className="group flex items-center gap-1.5 font-syne text-xs uppercase tracking-widest text-[#EAE0D5]/70 hover:text-[#C84B31] transition-all"
+                transition={{ duration: 0.5, delay: Math.min(i * 0.1, 0.3), ease: cubicEase }}
+                whileHover={{ scale: isMobile ? 1 : 1.15, rotate: isMobile ? 0 : 4 }}
+                className="group flex items-center gap-1.5 font-syne text-xs uppercase tracking-widest text-[#EAE0D5]/70 hover:text-[#C84B31] transition-all py-1 min-h-[44px]"
               >
                 <span>{social.name}</span>
                 <ArrowUpRight size={14} className="opacity-50 group-hover:opacity-100 group-hover:text-[#C84B31] transition-opacity" />
@@ -325,7 +331,7 @@ export const ContactSection: React.FC = () => {
 
           <button
             onClick={scrollToTop}
-            className="font-syne text-xs uppercase tracking-widest text-[#EAE0D5]/60 hover:text-[#C84B31] hover:border-[#C84B31] border border-white/20 px-4 py-2 rounded-full transition-all cursor-pointer"
+            className="font-syne text-xs uppercase tracking-widest text-[#EAE0D5]/60 hover:text-[#C84B31] hover:border-[#C84B31] border border-white/20 px-4 py-2 rounded-full transition-all cursor-pointer min-h-[44px]"
           >
             Back To Top &uarr;
           </button>
@@ -346,3 +352,4 @@ export const ContactSection: React.FC = () => {
     </footer>
   );
 };
+

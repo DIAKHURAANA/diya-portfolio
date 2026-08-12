@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Layout, Globe, Video, Palette, Megaphone, Film, Share2, ArrowUpRight } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
+import { useInView } from '../hooks/useInView';
 
 interface SkillService {
   id: string;
@@ -70,7 +72,7 @@ const servicesList: SkillService[] = [
   },
 ];
 
-// Custom High-Res Vector Logos for the 5 Tools (Framer Motion, Photoshop, Adobe XD, Illustrator, Webflow)
+// Custom High-Res Vector Logos for the 5 Tools
 const ToolLogos: Record<string, React.FC> = {
   'Framer Motion': () => (
     <svg viewBox="0 0 24 24" className="w-6 h-6 fill-[#0055FF] group-hover:scale-110 transition-transform">
@@ -136,6 +138,8 @@ const toolsList = [
 ];
 
 export const ServicesSection: React.FC = () => {
+  const isMobile = useMobile();
+  const { ref: sectionRef, isInView } = useInView<HTMLElement>({ threshold: 0.05 });
   const cubicEase = [0.22, 1, 0.36, 1] as const;
   const headingWords = ["WHAT", "I", "HELP", "YOU", "SHAPE"];
   const [imageErrorMap, setImageErrorMap] = useState<Record<string, boolean>>({});
@@ -147,20 +151,23 @@ export const ServicesSection: React.FC = () => {
   return (
     <section
       id="services"
+      ref={sectionRef}
       className="relative min-h-screen w-full py-28 px-6 sm:px-10 md:px-16 bg-transparent overflow-hidden border-t border-white/10 select-none"
     >
-      {/* Slow Gradient Light Sweep Background */}
-      <motion.div
-        animate={{
-          background: [
-            'radial-gradient(circle at 20% 30%, rgba(200, 75, 49, 0.15) 0%, transparent 60%)',
-            'radial-gradient(circle at 80% 70%, rgba(200, 75, 49, 0.18) 0%, transparent 60%)',
-            'radial-gradient(circle at 20% 30%, rgba(200, 75, 49, 0.15) 0%, transparent 60%)',
-          ],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute inset-0 pointer-events-none"
-      />
+      {/* Slow Gradient Light Sweep Background - Paused on mobile */}
+      {!isMobile && isInView && (
+        <motion.div
+          animate={{
+            background: [
+              'radial-gradient(circle at 20% 30%, rgba(200, 75, 49, 0.15) 0%, transparent 60%)',
+              'radial-gradient(circle at 80% 70%, rgba(200, 75, 49, 0.18) 0%, transparent 60%)',
+              'radial-gradient(circle at 20% 30%, rgba(200, 75, 49, 0.15) 0%, transparent 60%)',
+            ],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-0 pointer-events-none"
+        />
+      )}
 
       <div className="max-w-7xl mx-auto relative z-10 space-y-20">
         {/* Main Grid: Left Heading + Right Services Cards */}
@@ -185,12 +192,12 @@ export const ServicesSection: React.FC = () => {
               {headingWords.map((word, index) => (
                 <motion.span
                   key={index}
-                  initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+                  initial={{ opacity: 0, y: 30, filter: isMobile ? undefined : 'blur(10px)' }}
                   whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 0.7,
-                    delay: index * 0.1,
+                    delay: Math.min(index * 0.1, 0.3),
                     ease: cubicEase,
                   }}
                   className={`font-bebas text-5xl sm:text-6xl md:text-7xl uppercase tracking-wider leading-none ${
@@ -207,7 +214,7 @@ export const ServicesSection: React.FC = () => {
               I partner with founders and brands to craft <span className="text-[#C84B31] font-semibold">high-converting digital experiences</span>, photorealistic 3D motion, and scalable brand identities that <span className="text-[#C84B31] font-semibold">drive measurable growth</span>.
             </p>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md max-w-sm">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 md:backdrop-blur-md max-w-sm">
               <span className="font-cinzel text-sm font-bold text-[#F0E6D2] block">END-TO-END CREATIVE EXCELLENCE</span>
               <span className="font-syne text-xs text-[#EAE0D5]/60 block mt-1">Strategy &bull; Design &bull; Motion &bull; Performance</span>
             </div>
@@ -220,19 +227,19 @@ export const ServicesSection: React.FC = () => {
               return (
                 <motion.div
                   key={service.id}
-                  initial={{ opacity: 0, x: 60, filter: 'blur(8px)' }}
-                  whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                  initial={{ opacity: 0, x: isMobile ? 0 : 60, y: isMobile ? 20 : 0, filter: isMobile ? undefined : 'blur(8px)' }}
+                  whileInView={{ opacity: 1, x: 0, y: 0, filter: 'blur(0px)' }}
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{
                     duration: 0.8,
-                    delay: index * 0.08,
+                    delay: Math.min(index * 0.08, 0.3),
                     ease: cubicEase,
                   }}
                   whileHover={{
-                    x: 8,
+                    x: isMobile ? 0 : 8,
                     transition: { duration: 0.3, ease: 'easeOut' },
                   }}
-                  className="group relative rounded-2xl p-6 sm:p-7 bg-black/40 backdrop-blur-xl border border-white/15 hover:border-[#C84B31]/80 transition-all duration-300 shadow-xl overflow-hidden cursor-pointer"
+                  className="group relative rounded-2xl p-6 sm:p-7 bg-black/40 md:backdrop-blur-xl border border-white/15 hover:border-[#C84B31]/80 transition-all duration-300 shadow-xl overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#C84B31]/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
@@ -273,7 +280,7 @@ export const ServicesSection: React.FC = () => {
           </div>
         </div>
 
-        {/* 🛠️ TOOLS I USE SECTION (Directly Below WHAT I HELP YOU SHAPE) */}
+        {/* 🛠️ TOOLS I USE SECTION */}
         <div className="pt-16 border-t border-white/15">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
@@ -312,7 +319,7 @@ export const ServicesSection: React.FC = () => {
             </motion.p>
           </div>
 
-          {/* 5 Tools Cards Grid with Guaranteed Image & Crisp Vector SVG Fallback */}
+          {/* 5 Tools Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {toolsList.map((tool, i) => {
               const VectorLogo = ToolLogos[tool.name];
@@ -324,13 +331,13 @@ export const ServicesSection: React.FC = () => {
                   initial={{ opacity: 0, y: 30, scale: 0.95 }}
                   whileInView={{ opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.7, delay: i * 0.1, ease: cubicEase }}
+                  transition={{ duration: 0.7, delay: Math.min(i * 0.1, 0.3), ease: cubicEase }}
                   whileHover={{
-                    y: -6,
-                    scale: 1.04,
+                    y: isMobile ? 0 : -6,
+                    scale: isMobile ? 1 : 1.04,
                     transition: { duration: 0.3, ease: 'easeOut' },
                   }}
-                  className="group relative rounded-2xl p-5 bg-black/50 backdrop-blur-xl border border-white/15 hover:border-[#C84B31] shadow-xl hover:shadow-[0_0_30px_rgba(200,75,49,0.6)] transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="group relative rounded-2xl p-5 bg-black/50 md:backdrop-blur-xl border border-white/15 hover:border-[#C84B31] shadow-xl hover:shadow-[0_0_30px_rgba(200,75,49,0.6)] transition-all duration-300 cursor-pointer flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between mb-5">
                     {/* Tool Picture Logo Frame with SVG Vector Fallback */}
@@ -339,6 +346,7 @@ export const ServicesSection: React.FC = () => {
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
+                          loading="lazy"
                           onError={() => handleImageError(tool.name)}
                           className="w-full h-full object-contain filter group-hover:scale-110 transition-transform duration-300"
                         />
@@ -369,3 +377,4 @@ export const ServicesSection: React.FC = () => {
     </section>
   );
 };
+

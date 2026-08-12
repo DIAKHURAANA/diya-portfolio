@@ -1,5 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useMobile } from '../hooks/useMobile';
+import { useInView } from '../hooks/useInView';
+import { LazyVideo } from './LazyVideo';
 
 interface MarqueeProject {
   title: string;
@@ -27,22 +30,38 @@ const row1Items = [...marqueeProjects, ...marqueeProjects];
 const row2Items = [...marqueeProjects.slice().reverse(), ...marqueeProjects.slice().reverse()];
 
 export const MarqueeSection: React.FC = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMobile();
+  const { ref: sectionRef, isInView } = useInView<HTMLDivElement>({ threshold: 0.05 });
   const [scrollOffset, setScrollOffset] = useState(0);
   const cubicEase = [0.22, 1, 0.36, 1] as const;
 
   useEffect(() => {
+    if (!isInView) return;
+
+    let ticking = false;
+    let animId: number | null = null;
+
     const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const sectionTop = sectionRef.current.offsetTop;
-      const offset = (window.scrollY - sectionTop + window.innerHeight) * 0.25;
-      setScrollOffset(offset);
+      if (ticking) return;
+      ticking = true;
+
+      animId = requestAnimationFrame(() => {
+        if (sectionRef.current) {
+          const sectionTop = sectionRef.current.offsetTop;
+          const offset = (window.scrollY - sectionTop + window.innerHeight) * 0.25;
+          setScrollOffset(offset);
+        }
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, [isInView, sectionRef]);
 
   const row1Transform = `translateX(${scrollOffset - 250}px)`;
   const row2Transform = `translateX(${-(scrollOffset - 250)}px)`;
@@ -58,7 +77,7 @@ export const MarqueeSection: React.FC = () => {
       {/* Header */}
       <div className="px-6 md:px-12 mb-12 text-center max-w-4xl mx-auto relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+          initial={{ opacity: 0, y: 20, filter: isMobile ? undefined : 'blur(8px)' }}
           whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: cubicEase }}
@@ -72,7 +91,7 @@ export const MarqueeSection: React.FC = () => {
         </motion.div>
 
         <motion.h2
-          initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+          initial={{ opacity: 0, y: 30, filter: isMobile ? undefined : 'blur(10px)' }}
           whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.9, delay: 0.1, ease: cubicEase }}
@@ -82,8 +101,8 @@ export const MarqueeSection: React.FC = () => {
         </motion.h2>
       </div>
 
-      {/* Row 1: Moves RIGHT on scroll with 3D perspective */}
-      <div className="overflow-hidden w-full mb-6 perspective-[1000px]">
+      {/* Row 1: Moves RIGHT on scroll */}
+      <div className="overflow-hidden w-full mb-6 md:perspective-[1000px]">
         <div
           className="flex gap-5 w-max"
           style={{
@@ -94,25 +113,23 @@ export const MarqueeSection: React.FC = () => {
           {row1Items.map((item, index) => (
             <motion.div
               key={`row1-${index}`}
-              initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+              initial={{ opacity: 0, scale: 0.9, filter: isMobile ? undefined : 'blur(10px)' }}
               whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: (index % 10) * 0.05, ease: cubicEase }}
+              transition={{ duration: 0.8, delay: Math.min((index % 10) * 0.05, 0.3), ease: cubicEase }}
               whileHover={{
-                scale: 1.06,
-                rotateY: 5,
+                scale: isMobile ? 1 : 1.06,
+                rotateY: isMobile ? 0 : 5,
                 transition: { duration: 0.3, ease: 'easeOut' },
               }}
               className="group relative w-[320px] h-[200px] sm:w-[400px] sm:h-[250px] md:w-[450px] md:h-[280px] shrink-0 rounded-2xl overflow-hidden bg-black/50 border border-white/15 hover:border-[#C84B31] shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(200,75,49,0.7)] transition-all duration-300 cursor-pointer"
             >
               {item.video ? (
-                <video
+                <LazyVideo
                   src={item.video}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out filter brightness-90 contrast-105"
+                  isMobile={isMobile}
+                  className="w-full h-full"
+                  videoClassName="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out filter brightness-90 contrast-105"
                 />
               ) : (
                 <img
@@ -138,7 +155,7 @@ export const MarqueeSection: React.FC = () => {
       </div>
 
       {/* Row 2: Moves LEFT on scroll */}
-      <div className="overflow-hidden w-full perspective-[1000px]">
+      <div className="overflow-hidden w-full md:perspective-[1000px]">
         <div
           className="flex gap-5 w-max"
           style={{
@@ -149,25 +166,23 @@ export const MarqueeSection: React.FC = () => {
           {row2Items.map((item, index) => (
             <motion.div
               key={`row2-${index}`}
-              initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+              initial={{ opacity: 0, scale: 0.9, filter: isMobile ? undefined : 'blur(10px)' }}
               whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: (index % 10) * 0.05, ease: cubicEase }}
+              transition={{ duration: 0.8, delay: Math.min((index % 10) * 0.05, 0.3), ease: cubicEase }}
               whileHover={{
-                scale: 1.06,
-                rotateY: -5,
+                scale: isMobile ? 1 : 1.06,
+                rotateY: isMobile ? 0 : -5,
                 transition: { duration: 0.3, ease: 'easeOut' },
               }}
               className="group relative w-[320px] h-[200px] sm:w-[400px] sm:h-[250px] md:w-[450px] md:h-[280px] shrink-0 rounded-2xl overflow-hidden bg-black/50 border border-white/15 hover:border-[#C84B31] shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_30px_rgba(200,75,49,0.7)] transition-all duration-300 cursor-pointer"
             >
               {item.video ? (
-                <video
+                <LazyVideo
                   src={item.video}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out filter brightness-90 contrast-105"
+                  isMobile={isMobile}
+                  className="w-full h-full"
+                  videoClassName="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out filter brightness-90 contrast-105"
                 />
               ) : (
                 <img
@@ -196,4 +211,5 @@ export const MarqueeSection: React.FC = () => {
 };
 
 export default MarqueeSection;
+
 
