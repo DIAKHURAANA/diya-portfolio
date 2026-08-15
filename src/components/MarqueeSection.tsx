@@ -12,7 +12,8 @@ interface MarqueeProject {
 }
 
 const marqueeProjects: MarqueeProject[] = [
-  { title: "CAFÉ 3D ANIMATION", tag: "3D Motion", video: "/videos/cafe_3d_animation.mp4" },
+  { title: "FEATURED MOTION #01", tag: "Featured Reel", video: "/videos/featured_clip_01.mp4" },
+  { title: "FEATURED MOTION #02", tag: "Brand Reel", video: "/videos/featured_clip_02.mp4" },
   { title: "PRODUCT ADS", tag: "Product Ads", video: "/videos/smartphone_product_ad.mp4" },
   { title: "MOTION", tag: "Motion", video: "/videos/showcase_05.mp4" },
   { title: "MOTION SHOWCASE #01", tag: "Recent Motion", video: "/videos/recent_motion_01.mp4" },
