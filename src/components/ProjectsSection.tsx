@@ -18,6 +18,15 @@ interface ProjectItem {
 const projectsList: ProjectItem[] = [
   {
     id: '01',
+    title: 'CAFÉ 3D ARCHITECTURAL ANIMATION',
+    category: '3D Motion Graphics & Architectural Visualization',
+    video: '/videos/cafe_3d_animation.mp4',
+    year: '2026',
+    tag: '3D Motion • Architectural',
+    description: 'High-impact 3D architectural visualization and timelapse reel illustrating a modern café structure appearing dynamically from an empty plot.',
+  },
+  {
+    id: '02',
     title: 'COMMERCIAL ADS & BRANDING',
     category: 'Brand Strategy & Commercial Ad Production',
     video: '/videos/ads_branding.mp4',
@@ -26,7 +35,7 @@ const projectsList: ProjectItem[] = [
     description: 'High-impact commercial video campaign integrating motion graphic design, visual brand identity, and performance marketing strategy.',
   },
   {
-    id: '02',
+    id: '03',
     title: 'UGC VIRAL BRAND REEL #1',
     category: 'UGC Video Creation & Brand Commercial',
     video: '/videos/ugc_video_01.mp4',
@@ -35,7 +44,7 @@ const projectsList: ProjectItem[] = [
     description: 'High-converting user generated video content designed for viral social reach and brand engagement across Instagram and TikTok.',
   },
   {
-    id: '03',
+    id: '04',
     title: 'UGC PRODUCT PERFORMANCE AD #2',
     category: 'Product Showcase & Social Growth',
     video: '/videos/ugc_video_02.mp4',
@@ -44,7 +53,7 @@ const projectsList: ProjectItem[] = [
     description: 'Dynamic product-focused UGC commercial showcasing authentic unboxing, performance testing, and direct consumer conversion storytelling.',
   },
   {
-    id: '04',
+    id: '05',
     title: '3D MOTION WEBSITE #01',
     category: '3D WebGL & Interactive Motion',
     video: '/videos/featured_project_01.mp4',
@@ -53,22 +62,13 @@ const projectsList: ProjectItem[] = [
     description: 'Immersive 3D motion website showcasing real-time WebGL physics, particle dynamics, and interactive visual storytelling.',
   },
   {
-    id: '05',
+    id: '06',
     title: '3D MOTION WEBSITE #02',
     category: '3D Motion Graphics & Web Canvas',
     video: '/videos/featured_project_04.mp4',
     year: '2026',
     tag: '3D Motion Website',
     description: 'High-performance 3D interactive web showcase featuring fluid canvas animations, Three.js shaders, and modern brand aesthetics.',
-  },
-  {
-    id: '06',
-    title: 'FEATURED CREATIVE MOTION REEL #03',
-    category: 'Creative Motion & Visual Editing',
-    video: '/videos/featured_project_03.mp4',
-    year: '2026',
-    tag: 'Featured Motion • Creative Reel',
-    description: 'High-energy creative motion reel demonstrating dynamic scene transitions, sound design sync, and visual brand storytelling.',
   },
 ];
 

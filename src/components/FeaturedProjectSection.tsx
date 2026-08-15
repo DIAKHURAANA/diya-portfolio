@@ -21,7 +21,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
   const scaleZoom = useTransform(scrollYProgress, [0.4, 0.8], [1, isMobile ? 1 : 1.15]);
   const textY = useTransform(scrollYProgress, [0.4, 0.8], [0, isMobile ? 0 : -40]);
 
-  const videoPath = '/videos/ads_branding.mp4';
+  const videoPath = '/videos/cafe_3d_animation.mp4';
 
   return (
     <section ref={sectionRef} className="relative min-h-screen w-full flex items-center justify-center bg-black overflow-hidden border-t border-white/10 select-none">
@@ -66,7 +66,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
           className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#C84B31]/40 bg-[#C84B31]/10 md:backdrop-blur-md text-[#EAE0D5] text-xs font-syne uppercase tracking-widest"
         >
           <Sparkles className="w-4 h-4 text-[#C84B31] animate-spin-slow" />
-          <span>FLAGSHIP ADS & BRANDING SHOWCASE</span>
+          <span>FLAGSHIP CAFÉ 3D ANIMATION SHOWCASE</span>
         </motion.div>
 
         {/* Large Typography with Mask Wipe Animation */}
@@ -78,7 +78,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
             transition={{ duration: 1.1, ease: cubicEase }}
             className="font-bebas text-6xl sm:text-8xl md:text-9xl uppercase tracking-tighter text-[#F0E6D2] leading-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
           >
-            COMMERCIAL ADS & BRANDING
+            CAFÉ 3D ANIMATION & REEL
           </motion.h2>
         </div>
 
@@ -90,7 +90,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
           transition={{ duration: 0.8, delay: 0.3, ease: cubicEase }}
           className="font-syne text-sm sm:text-base font-light text-[#EAE0D5]/80 leading-relaxed max-w-2xl"
         >
-          A flagship commercial ads campaign showcasing high-impact brand strategy, motion typography, product commercial editing, and social conversion creative.
+          A flagship 3D architectural animation and motion reel showcasing a modern café structure dynamically appearing from an empty plot.
         </motion.p>
 
         {/* Action Buttons */}
@@ -110,7 +110,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
               className="flex items-center gap-3 px-8 py-4 rounded-xl bg-[#C84B31] hover:bg-[#b03d27] text-[#F0E6D2] font-syne text-xs uppercase tracking-widest font-bold transition-all shadow-[0_0_30px_rgba(200,75,49,0.6)] cursor-pointer"
             >
               <Play className="w-4 h-4 fill-current" />
-              <span>WATCH BRANDING REEL (WITH AUDIO)</span>
+              <span>WATCH CAFÉ 3D REEL (WITH AUDIO)</span>
             </button>
           </Magnet>
         </motion.div>
@@ -139,7 +139,7 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-4 h-4 text-[#C84B31]" />
                   <span className="font-syne text-xs uppercase tracking-widest text-[#EAE0D5]">
-                    FLAGSHIP COMMERCIAL AD SHOWCASE
+                    FLAGSHIP CAFÉ 3D AD SHOWCASE
                   </span>
                 </div>
 
@@ -178,15 +178,15 @@ export const FeaturedProjectSection: React.FC<FeaturedProjectProps> = () => {
               <div className="p-6 bg-black/60 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="font-bebas text-3xl uppercase tracking-wider text-[#F0E6D2]">
-                    COMMERCIAL ADS & BRANDING REEL
+                    CAFÉ 3D ARCHITECTURAL ANIMATION REEL
                   </h3>
                   <p className="font-syne text-xs text-[#EAE0D5]/70 max-w-xl mt-1">
-                    Premium ad video commercial demonstrating strategic storytelling, brand aesthetic framing, and dynamic motion graphics.
+                    3D architectural visualization demonstrating strategic camera motion, realistic structure build-up, and dynamic motion graphics.
                   </p>
                 </div>
 
                 <span className="px-4 py-2 rounded-full bg-[#C84B31]/20 border border-[#C84B31]/50 text-[#F0E6D2] font-syne text-xs font-bold tracking-widest uppercase self-start sm:self-auto shrink-0">
-                  COMMERCIAL ADS • BRANDING
+                  3D ANIMATION • CAFÉ SHOWCASE
                 </span>
               </div>
             </motion.div>
